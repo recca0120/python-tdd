@@ -1,30 +1,40 @@
-import ftplib
+import filecmp
+import os
+
+import pytest
+
+from ftp import Client
 
 
-class Client:
-    def __init__(self, host, username, password, port=21):
-        self.host = host
-        self.username = username
-        self.password = password
-        self.port = port
-
-    def login(self):
-        client = ftplib.FTP()
-        client.connect(host=self.host, port=self.port)
-
-        try:
-            return '230' in client.login(user=self.username, passwd=self.password)
-        except ftplib.error_perm:
-            return False
+@pytest.fixture(autouse=True)
+def after():
+    yield
+    if os.path.exists('fixtures/MEMBER_TRANS_SET_20220417.csv'):
+        os.unlink('fixtures/MEMBER_TRANS_SET_20220417.csv')
 
 
 def test_login_successful(ftpserver):
-    client = Client(host='127.0.0.1', username='benz', password='erni1')
+    client = given_client()
 
     assert client.login() is True
 
 
 def test_login_failed(ftpserver):
-    client = Client(host='127.0.0.1', username='benz', password='erni2')
+    client = given_client(password='erni2')
 
     assert client.login() is False
+
+
+def test_download_file(ftpserver):
+    client = given_client()
+    source = 'test_data/MEMBER_TRANS_SET_20220417.csv'
+    target = 'fixtures/MEMBER_TRANS_SET_20220417.csv'
+
+    assert client.download(source, target) is True
+    assert filecmp.cmp(ftpserver.server_home + '/' + source, target)
+
+
+def given_client(password=None):
+    client = Client(password=password)
+
+    return client
