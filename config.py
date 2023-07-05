@@ -9,3 +9,7 @@ ftp = {
     'username': os.environ.get('FTP_USERNAME'),
     'password': os.environ.get('FTP_PASSWORD'),
 }
+
+db = {
+    'url': os.environ.get('DB_URL')
+}

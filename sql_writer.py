@@ -2,8 +2,12 @@ import re
 from datetime import date
 
 import pandas
-from sqlalchemy import String, Date
+from sqlalchemy import String, Date, create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
+
+import config
+
+engine = create_engine(config.db.get('url'), echo=False)
 
 
 class Base(DeclarativeBase):
