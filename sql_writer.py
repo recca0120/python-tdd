@@ -1,5 +1,8 @@
+import re
+from datetime import date
+
 import pandas
-from sqlalchemy import create_engine, String
+from sqlalchemy import create_engine, String, Date
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
 engine = create_engine("sqlite://", echo=False)
@@ -52,16 +55,19 @@ class Record(Base):
     tran_seq: Mapped[str] = mapped_column(String(30))
     receipt_to: Mapped[str] = mapped_column(String(30), nullable=True)
     uni_no: Mapped[str] = mapped_column(String(30), nullable=True)
+    dts: Mapped[date] = mapped_column(Date)
 
 
 class SqlWriter:
     def write(self, csv):
-        columns = Record.__table__.columns.keys()[1:]
+        matched = re.search(r'MEMBER_TRANS_SET_(\d+)\.csv', csv).group(1)
+        dts = date.fromisoformat('%s-%s-%s' % (matched[0:4], matched[4:6], matched[6:8]))
+        columns = Record.__table__.columns.keys()[1:-1]
         df = pandas.read_csv(csv, encoding='utf-8', header=None, names=columns, dtype=str)
 
         with Session(engine) as session:
             for item in df.itertuples():
-                data = {}
+                data = {'dts': dts}
                 for column in columns:
                     value = getattr(item, column)
                     data[column] = value.strip() if type(value) is str else value

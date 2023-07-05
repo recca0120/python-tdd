@@ -1,3 +1,5 @@
+from datetime import date
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -19,3 +21,4 @@ def test_write_csv_to_database():
     assert record.active_point == '000000'
     assert record.card_no == 'GID45362771301926'
     assert record.tran_seq == '08621671'
+    assert record.dts == date.fromisoformat('2022-04-17')
