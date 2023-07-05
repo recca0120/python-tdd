@@ -16,3 +16,6 @@ def test_write_csv_to_database():
     record = session.scalars(stmt).first()
 
     assert record.id is 1
+    assert record.active_point == '000000'
+    assert record.card_no == 'GID45362771301926'
+    assert record.tran_seq == '08621671'
