@@ -60,7 +60,11 @@ class Record(Base):
 
 class SqlWriter:
     def write(self, csv):
-        matched = re.search(r'MEMBER_TRANS_SET_(\d+)\.csv', csv).group(1)
+        group = re.search(r'MEMBER_TRANS_SET_(\d+)\.csv', csv)
+        if group is None:
+            raise ValueError('date is invalid')
+
+        matched = group.group(1)
         dts = date.fromisoformat('%s-%s-%s' % (matched[0:4], matched[4:6], matched[6:8]))
         columns = Record.__table__.columns.keys()[1:-1]
         df = pandas.read_csv(csv, encoding='utf-8', header=None, names=columns, dtype=str)
