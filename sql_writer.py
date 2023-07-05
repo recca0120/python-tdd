@@ -5,7 +5,9 @@ import pandas
 from sqlalchemy import create_engine, String, Date
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
-engine = create_engine("sqlite://", echo=False)
+import config
+
+engine = create_engine(config.db.get('url'), echo=False)
 
 
 class Base(DeclarativeBase):
